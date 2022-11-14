@@ -1,0 +1,5 @@
+<%= form_with url: '/calculates/create', method: :post, local: false do |form| %>
+  <%= form.label :numbers, 'Введите последовательность чисел:' %><br><br>
+  <%= form.text_field :numbers %><br><br>
+  <%= form.submit "Ввод" %><br><br>
+<% end %>

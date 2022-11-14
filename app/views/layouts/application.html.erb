@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Rk2</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <header class="container">
+      <p>Китаев Тагир Адипович, ИУ6-35Б</p>
+      <p>Билет n</p>
+      <p>Задание: </p>
+      <hr/>
+    </header>
+
+    <main class="container">
+      <% if flash[:notice].present? %>
+        <strong><%= flash[:notice] %></strong>
+      <% end %>
+
+      <%= yield %>
+    </main>
+
+    <footer></footer>
+  </body>
+</html>
