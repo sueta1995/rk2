@@ -22,16 +22,22 @@ class CalculatesController < ApplicationController
   def valid?
     temp = checking
 
-    unless temp[:result].nil?
-      redirect_to(root_path,
-                  notice: "Найден посторонний символ на #{temp[:index] + 1} месте: #{temp[:result]}.") and return
-    end
-    redirect_to(root_path, notice: 'Обнаружен минус без числа.') and return if @input.split(' ').include?('-')
-    redirect_to(root_path, notice: 'Введите непустую строку.') and return if @input.split(' ').empty?
+    # unless temp[:result].nil?
+    #   redirect_to(root_path,
+    #               notice: "Найден посторонний символ на #{temp[:index] + 1} месте: #{temp[:result]}.") and return
+    # end
+    return if base_case(temp)
 
-    @input.split(' ').each do |x|
-      redirect_to(root_path, notice: 'Обнаружены посторонние символы.') and return if x.length != x.to_i.to_s.length
-    end
+    # redirect_to(root_path, notice: 'Обнаружен минус без числа.') and return if @input.split(' ').include?('-')
+    return if minus_case
+
+    # redirect_to(root_path, notice: 'Введите непустую строку.') and return if @input.split(' ').empty?
+    return if empty_case
+
+    # @input.split(' ').each do |x|
+    #   redirect_to(root_path, notice: 'Обнаружены посторонние символы.') and return if x.length != x.to_i.to_s.length
+    # end
+    return if specific_case
   end
 
   def checking
@@ -46,5 +52,36 @@ class CalculatesController < ApplicationController
     end
 
     { result:, index: }
+  end
+
+  def base_case(temp)
+    return if temp[:result].nil?
+
+    redirect_to(root_path,
+                notice: "Найден посторонний символ на #{temp[:index] + 1} месте: #{temp[:result]}."); true
+  end
+
+  def minus_case
+    return unless @input.split(' ').include?('-')
+
+    redirect_to(root_path, notice: 'Обнаружен минус без числа.')
+    true
+  end
+
+  def empty_case
+    return unless @input.split(' ').empty?
+
+    redirect_to(root_path, notice: 'Введите непустую строку.')
+    true
+  end
+
+  def specific_case
+    @input.split(' ').each do |x|
+      next unless x.length != x.to_i.to_s.length
+
+      redirect_to(root_path, notice: 'Обнаружены посторонние символы: лишние 0 или минус.')
+
+      return true
+    end
   end
 end
