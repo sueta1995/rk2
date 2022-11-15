@@ -20,6 +20,21 @@ class CalculatesController < ApplicationController
   end
 
   def valid?
+    temp = checking
+
+    unless temp[:result].nil?
+      redirect_to(root_path,
+                  notice: "Найден посторонний символ на #{temp[:index] + 1} месте: #{temp[:result]}.") and return
+    end
+    redirect_to(root_path, notice: 'Обнаружен минус без числа.') and return if @input.split(' ').include?('-')
+    redirect_to(root_path, notice: 'Введите непустую строку.') and return if @input.split(' ').empty?
+
+    @input.split(' ').each do |x|
+      redirect_to(root_path, notice: 'Обнаружены посторонние символы.') and return if x.length != x.to_i.to_s.length
+    end
+  end
+
+  def checking
     result = nil
     index = 0
 
@@ -30,8 +45,6 @@ class CalculatesController < ApplicationController
       end
     end
 
-    redirect_to(root_path, notice: "Найден посторонний символ на #{index + 1} месте: #{result}.") and return unless result.nil?
-    redirect_to(root_path, notice: 'Обнаружен минус без числа.') and return if @input.split(' ').include?('-')
-    redirect_to(root_path, notice: 'Введите непустую строку.') and return if @input.split(' ').empty?
+    { result:, index: }
   end
 end
