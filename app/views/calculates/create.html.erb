@@ -7,3 +7,7 @@
 <hr/>
 
 <p>После обработки:</p>
+
+<% @result_arr.each_index do |i| %>
+	<p><%= i + 1 %>-ое число: <strong><%= @result_arr[i] %></strong></p>
+<% end %>

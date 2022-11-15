@@ -8,9 +8,10 @@ class CalculatesController < ApplicationController
   def new; end
 
   def create
-    @input_arr = @input.split(' ')
+    @input_arr = @input.split(' ').collect(&:to_f)
+    @result_arr = []
 
-    # methods
+    calculting
   end
 
   private
@@ -22,21 +23,8 @@ class CalculatesController < ApplicationController
   def valid?
     temp = checking
 
-    # unless temp[:result].nil?
-    #   redirect_to(root_path,
-    #               notice: "Найден посторонний символ на #{temp[:index] + 1} месте: #{temp[:result]}.") and return
-    # end
     return if base_case(temp)
-
-    # redirect_to(root_path, notice: 'Обнаружен минус без числа.') and return if @input.split(' ').include?('-')
-    return if minus_case
-
-    # redirect_to(root_path, notice: 'Введите непустую строку.') and return if @input.split(' ').empty?
     return if empty_case
-
-    # @input.split(' ').each do |x|
-    #   redirect_to(root_path, notice: 'Обнаружены посторонние символы.') and return if x.length != x.to_i.to_s.length
-    # end
     return if specific_case
   end
 
@@ -45,7 +33,7 @@ class CalculatesController < ApplicationController
     index = 0
 
     @input.split('').each_index do |i|
-      unless @input[i] =~ /[-0-9 ]/
+      unless @input[i] =~ /[-0-9. ]/
         (result = @input[i]
          index = i)
       end
@@ -61,13 +49,6 @@ class CalculatesController < ApplicationController
                 notice: "Найден посторонний символ на #{temp[:index] + 1} месте: #{temp[:result]}."); true
   end
 
-  def minus_case
-    return unless @input.split(' ').include?('-')
-
-    redirect_to(root_path, notice: 'Обнаружен минус без числа.')
-    true
-  end
-
   def empty_case
     return unless @input.split(' ').empty?
 
@@ -77,11 +58,34 @@ class CalculatesController < ApplicationController
 
   def specific_case
     @input.split(' ').each do |x|
-      next unless x.length != x.to_i.to_s.length
+      x = x.to_f.to_s if x.to_i.to_f.to_s == x.to_f.to_s
+      next unless x != x.to_f.to_s
 
-      redirect_to(root_path, notice: 'Обнаружены посторонние символы: лишние 0 или минус.')
+      redirect_to(root_path, notice: 'Обнаружены посторонние символы: лишние нули, точки или минус.')
 
       return true
     end
+  end
+
+  def calculting
+    pos_c = @input_arr.select(&:positive?).length
+    neg_c = @input_arr.select(&:negative?).length
+    attitude = pos_c.positive? ? neg_c.to_f / pos_c : 0
+
+    changing(attitude, pos_c)
+  end
+
+  def changing(attitude, pos_c)
+    completed = false
+
+    @input_arr.length.times do |x|
+      if @input_arr[x].positive? && !completed
+        @result_arr << attitude
+        completed = true
+      end
+      @result_arr << @input_arr[x]
+    end
+
+    @result_arr << 0 if pos_c.zero?
   end
 end
